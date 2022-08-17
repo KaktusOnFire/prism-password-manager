@@ -1,0 +1,80 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Encryption Key {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+
+        <div class="section-header pb-1 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 text-center">
+                        <h1 class="display-3 mb-4">Encryption Key</h1>
+                        {% if is_err %}
+                        <p class="lead mb-5">Your encryption key is unavailable or outdated</p>
+                        <p class="lead mb-5">If you have previously generated a key - provide it in the form below. This key will be saved for comfort usage. <br>OR <br>You can generate a new key by clicking on the "Generate Key" button.</p>
+                        {% else %}
+                        <p class="lead mb-5">Your encryption key is <br>{{ key }}</p>
+                        <p class="lead mb-5">Use this key to encrypt/decrypt all of your passwords. Keep this key secret!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <section class="section section-lg pt-3">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <div class="alert alert-info" role="alert">
+                            <span class="alert-inner--icon"><i class="far fa-bell"></i></span>
+                            <h5 class="alert-heading">Data loss warning!</h5>
+                            <p>Before updating the encryption key, be sure that you saved your old key, to keep access to all of your secrets.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center mb-5 mb-lg-6">
+                    <div class="col-12 col-lg-8">
+                        <div class="card border-0 p-2 p-md-3 p-lg-5">
+                            <div class="card-body px-0 pt-0">
+                                <form method="post" action="">
+                                    {% csrf_token %}
+                                    {% for field in form %}
+                                    <div class="mb-4">
+                                        <label>{{ field.label }}</label>
+                                        {{ field }}
+                                    </div>
+                                    {% endfor %}
+                                    {% if form.errors %}
+                                    {% for f, es in form.errors.items %}
+                                        {% for e in es %}
+                                            <div class="mb-4 alert alert-danger" role="alert">
+                                                <span class="alert-inner--text">{{ e }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% endif %}
+                                    <div class="d-grid">
+                                        <button name="update" class="btn mb-2 mr-2 btn-pill btn-outline-primary" type="submit">Update Key</button>
+                                        <button name="generate" class="btn mb-2 mr-2 btn-pill btn-outline-primary" type="submit" formnovalidate>Generate Key</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- {% include 'includes/footer-about.html' %} -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

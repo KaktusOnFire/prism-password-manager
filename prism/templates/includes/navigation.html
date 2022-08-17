@@ -1,0 +1,64 @@
+
+    <header class="header-global">
+        <nav id="navbar-main" aria-label="Primary navigation" class="navbar navbar-main navbar-expand-lg navbar-theme-primary headroom navbar-dark">
+            <div class="container position-relative">
+                <a class="navbar-brand me-lg-5" href="./index.html">
+                    <img class="navbar-brand-dark" src="{{ ASSETS_ROOT }}/img/brand/light.svg" alt="Logo light">
+                    <img class="navbar-brand-light" src="{{ ASSETS_ROOT }}/img/brand/dark.svg" alt="Logo dark">
+                </a>
+                <div class="navbar-collapse collapse me-auto" id="navbar_global">
+                    <div class="navbar-collapse-header">
+                        <div class="row">
+                            <div class="col-6 collapse-brand">
+                                <a href="./index.html">
+                                    <img src="{{ ASSETS_ROOT }}/img/brand/dark.svg" alt="Themesberg logo">
+                                </a>
+                            </div>
+                            <div class="col-6 collapse-close">
+                                <a href="#navbar_global" class="fas fa-times" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" title="close" aria-label="Toggle navigation"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkMain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Secrets
+                            <i class="fas fa-angle-down nav-link-arrow ml-2"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkMain">
+                                <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" id="navbarDropdownMenuLinkAdd" href="#">Create<i class="fas fa-angle-down nav-link-arrow ml-2"></i></a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkAdd">
+                                        <li><a class="dropdown-item" href="{% url 'crypto:create_pass' %}">Password</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'crypto:create_social' %}">Social Account</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'crypto:create_ssh' %}">SSH Keypair</a></li>
+                                    </ul>
+                                </li>
+                                <li><a class="dropdown-item" href="#">Manage</a></li>
+                                <li><a class="dropdown-item" href="#">Share</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkKeys" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Keys
+                            <i class="fas fa-angle-down nav-link-arrow ml-2"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkKeys">
+                                <li><a class="dropdown-item" href="{% url 'accounts:updatepk' %}">Manage Encryption Key</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">Profile</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'accounts:logout' %}"
+                       class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3"><span class="fas fa-sign-out-alt me-2"></span> Logout</a>
+                    <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+

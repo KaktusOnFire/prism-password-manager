@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED 1
 # install dependencies
 COPY requirements.txt .
 RUN apt-get -y update \
-    && apt-get --no-install-recommends -y install make gcc g++ subversion musl-dev libpq-dev netcat\
+    && apt-get --no-install-recommends -y install make gcc g++ subversion musl-dev libpq-dev\
     && pip install --upgrade pip wheel \
     && pip install --no-cache-dir -r requirements.txt
 

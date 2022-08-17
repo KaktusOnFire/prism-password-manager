@@ -1,0 +1,68 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} New {{ object }} {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        <!-- {% include 'includes/preloader.html' %} -->
+
+        <div class="section-header pb-1 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 text-center">
+                        <h1 class="display-3 mb-4">New {{ object }}</h1>
+                        <p class="lead mb-5">Add new {{ object }} using the form below.</p>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <section class="section section-lg pt-3">
+            <div class="container">
+                <div class="row justify-content-center mb-5 mb-lg-6">
+                    <div class="col-12 col-lg-8">
+                        <div class="card border-0 p-2 p-md-3 p-lg-5">
+                            <div class="card-body px-0 pt-0">
+                                <form method="post" action="">
+                                    {% csrf_token %}
+                                    {% for field in form %}
+                                    <div class="mb-4">
+                                        <label>{{ field.label }}</label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                    {% if form.errors %}
+                                    {% for f, es in form.errors.items %}
+                                        {% for e in es %}
+                                            <div class="mb-4 alert alert-danger" role="alert">
+                                                <span class="alert-inner--text">{{ e }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% endif %}
+                                    <div class="d-grid">
+                                        <button class="btn mb-2 mr-2 btn-pill btn-outline-primary" type="submit">Create</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- {% include 'includes/footer-about.html' %} -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -17,9 +17,15 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include
+
+from apps.crypto.views import SecretsView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('manager/', admin.site.urls),
+    path('auth/', include('apps.accounts.urls')),
+    path('secrets/', include('apps.crypto.urls')),
+    path('', SecretsView.as_view(), name='home'),
 ]
 
 if bool(settings.DEBUG):

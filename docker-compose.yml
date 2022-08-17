@@ -30,7 +30,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./prism/:/usr/src/prism/
+      - ./data/staticfiles:/usr/src/app/staticfiles
+      - ./data/mediafiles:/usr/src/app/mediafiles
     restart: on-failure:5
     depends_on:
       db:
