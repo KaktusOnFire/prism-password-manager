@@ -15,8 +15,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-12 col-md-8 text-center">
-                        <h1 class="display-3 mb-4">New {{ object }}</h1>
-                        <p class="lead mb-5">Add new {{ object }} using the form below.</p>
+                        <h1 class="display-3 mb-4">{{ object }}</h1>
                     </div>
                 </div>
             </div>
@@ -60,7 +59,8 @@
                                     {% endfor %}
                                     {% endif %}
                                     <div class="d-grid">
-                                        <button class="btn mb-2 mr-2 btn-pill btn-outline-primary" type="submit">Create</button>
+                                        <button name="edit" class="btn mb-2 mr-2 btn-pill btn-outline-primary" type="submit">Edit</button>
+                                        <button name="decrypt" class="btn mb-2 mr-2 btn-pill btn-outline-primary" type="submit">Decrypt</button>
                                 </form>
                             </div>
                         </div>

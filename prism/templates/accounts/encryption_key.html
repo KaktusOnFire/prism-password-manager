@@ -14,13 +14,6 @@
                 <div class="row justify-content-center">
                     <div class="col-12 col-md-8 text-center">
                         <h1 class="display-3 mb-4">Encryption Key</h1>
-                        {% if is_err %}
-                        <p class="lead mb-5">Your encryption key is unavailable or outdated</p>
-                        <p class="lead mb-5">If you have previously generated a key - provide it in the form below. This key will be saved for comfort usage. <br>OR <br>You can generate a new key by clicking on the "Generate Key" button.</p>
-                        {% else %}
-                        <p class="lead mb-5">Your encryption key is <br>{{ key }}</p>
-                        <p class="lead mb-5">Use this key to encrypt/decrypt all of your passwords. Keep this key secret!</p>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -28,6 +21,17 @@
 
         <section class="section section-lg pt-3">
             <div class="container">
+                {% if is_err %}
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <div class="alert alert-warning" role="alert">
+                            <span class="alert-inner--icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <h5 class="alert-heading">Your encryption key is unavailable or outdated!</h5>
+                            <p>If you have previously generated a key - provide it in the form below. This key will be saved for comfort usage. <br>OR <br>You can generate a new key by clicking on the "Generate Key" button.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
                 <div class="row justify-content-center">
                     <div class="col-12 col-lg-8">
                         <div class="alert alert-info" role="alert">

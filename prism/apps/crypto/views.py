@@ -86,17 +86,8 @@ class TemplateEditView(LoginRequiredMixin, KeyCookieRequiredMixin, View):
     object_type: str = None        
 
     def get(self, request, pk, *args, **kwargs):
-        to_decrypt = request.GET.get("decrypted")
         obj = get_object_or_404(self.model, pk=pk)
         is_err = False
-        if to_decrypt:
-            encryption_key = get_encryption_key(request)
-            if encryption_key:
-                try:
-                    secret_data = CryptoManager.decrypt(encryption_key, getattr(obj, self.field_to_encrypt))
-                    setattr(obj, self.field_to_encrypt, secret_data)
-                except InvalidToken:
-                    is_err = True
 
         form = self.form(instance=obj)
         context = {
@@ -107,22 +98,49 @@ class TemplateEditView(LoginRequiredMixin, KeyCookieRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-    # def post(self, request, *args, **kwargs):
-    #     form = self.form(request.POST or None)
-    #     if form.is_valid():
-    #         encryption_key = get_encryption_key(request)
-    #         if encryption_key:
-    #             obj = form.save(commit=False)
-    #             secret_data = CryptoManager.encrypt(encryption_key, form.cleaned_data[self.field_to_encrypt])
-    #             setattr(obj, self.field_to_encrypt, secret_data)
-    #             obj.owner = request.user
-    #             obj.save()
-    #         return redirect('home')
+    def post(self, request, pk, *args, **kwargs):
+        current_data = get_object_or_404(self.model, id=pk)
+        encryption_key = get_encryption_key(request)
+        if 'edit' in request.POST:
+            form = self.form(data=request.POST, instance=current_data)
+            if form.is_valid():
+                obj = form.save(commit=False)
+                if self.field_to_encrypt in form.changed_data:
+                    if encryption_key:
+                        secret_data = CryptoManager.encrypt(encryption_key, form.cleaned_data[self.field_to_encrypt])
+                        setattr(obj, self.field_to_encrypt, secret_data)
+                    else:
+                        context = {
+                            'form': form,
+                            "object": self.object_type,
+                            "is_err": True
+                        }
+                        return render(request, self.template_name, context)
+                obj.save()
+                return redirect('home')
+            else:
+                context = {
+                    'form': form,
+                    "object": self.object_type,
+                    "is_err": False
+                }
+            return render(request, self.template_name, context)
 
-    #     context = {
-    #         "form": form
-    #     }
-    #     return render(request, self.template_name, context)
+        elif 'decrypt' in request.POST:
+            if encryption_key:
+                try:
+                    secret_data = CryptoManager.decrypt(encryption_key, getattr(current_data, self.field_to_encrypt))
+                    form = self.form(instance=current_data, initial={self.field_to_encrypt: secret_data})
+                    is_err = False
+                except InvalidToken:
+                    form = self.form(instance=current_data)
+                    is_err = True
+            context = {
+                'form': form,
+                "object": self.object_type,
+                "is_err": is_err
+            }
+            return render(request, self.template_name, context)
 
 class TemplateDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "crypto/delete.html"
@@ -142,26 +160,26 @@ class CreateSocialAccountView(TemplateCreateView):
 class CreateSSHKeypairView(TemplateCreateView):
     form = SSHKeypairForm
     field_to_encrypt = 'private_key'
-    object_type = 'SSH keypair'
+    object_type = 'SSH key pair'
 
 #Edit Views
 class EditPasswordView(TemplateEditView):
     form = PasswordForm
     model = EncryptedPassword
     field_to_encrypt = 'password'
-    object_type = 'password'
+    object_type = 'Password'
 
 class EditSocialAccountView(TemplateEditView):
     form = SocialAccountForm
     model = EncryptedSocialAccount
     field_to_encrypt = 'password'
-    object_type = 'social account'
+    object_type = 'Social Account'
 
 class EditSSHKeypairView(TemplateEditView):
     form = SSHKeypairForm
     model = EncryptedSSHKeypair
     field_to_encrypt = 'private_key'
-    object_type = 'SSH keypair'
+    object_type = 'SSH Key pair'
 
 #Delete Views
 class DeletePasswordView(TemplateDeleteView):

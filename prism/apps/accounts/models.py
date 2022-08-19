@@ -24,7 +24,6 @@ class PrismUser(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     is_active = models.BooleanField(_('account status'), default=True)
     is_confirmed = models.BooleanField(_('email confirmed'), default=False)
-    date_registered = models.DateTimeField(_('date registered'), auto_now_add=True)
     timezone = models.CharField(_('timezone'), max_length=100, default="UTC")
     avatar = models.ImageField(upload_to=PathAndRename('avatars/'), null=True, blank=True)
 

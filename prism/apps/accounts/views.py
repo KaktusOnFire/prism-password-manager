@@ -51,13 +51,14 @@ class EncryptionKeyView(LoginRequiredMixin, View):
     template_name = "accounts/encryption_key.html"
 
     def get(self, request, *args, **kwargs):
-        form = EncryptionKeyForm()
         signer = TimestampSigner()
         try:
             encryption_cookie = request.get_signed_cookie('prism_key', max_age=settings.ENCRYPTION_COOKIE_AGE)
             encryption_key = signer.unsign_object(encryption_cookie, max_age=settings.ENCRYPTION_COOKIE_AGE)
             err = False
+            form = EncryptionKeyForm(initial={"key": encryption_key})
         except (KeyError, BadSignature, SignatureExpired):
+            form = EncryptionKeyForm()
             encryption_key = None
             err = True
 
@@ -70,8 +71,8 @@ class EncryptionKeyView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if 'generate' in request.POST:
-            form = EncryptionKeyForm()
             key = CryptoManager.create_pkey().decode("utf-8")
+            form = EncryptionKeyForm(initial={"key": key})
             context = {
                 'form': form,
                 'key': key,
@@ -131,7 +132,6 @@ class EncryptionKeyView(LoginRequiredMixin, View):
             else:
                 context ={
                     'form': form,
-                    'is_err': True
                 }
 
             return render(request, self.template_name, context)

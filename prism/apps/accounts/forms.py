@@ -1,6 +1,19 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+
+from .models import PrismUser
 
 from apps.crypto.forms import FernetField
+
+class PrismUserCreationForm(UserCreationForm):
+    class Meta:
+        model = PrismUser
+        fields = ('username', 'email')
+
+class PrismUserChangeForm(UserChangeForm):
+    class Meta:
+        model = PrismUser
+        fields = ('username', 'email')
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -30,9 +43,8 @@ class LoginForm(forms.Form):
 class EncryptionKeyForm(forms.Form):
     key = FernetField(
         label="Encryption Key",
-        widget=forms.PasswordInput(
+        widget=forms.TextInput(
             attrs={
-                "placeholder": "Encryption Key",
                 "class": "form-control"
             }
         ))
