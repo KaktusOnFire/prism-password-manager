@@ -49,7 +49,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Setup test database
+    - name: Run migrations
       env:
         POSTGRES_DB_NAME: ${{ matrix.database-name }}
         POSTGRES_USER: ${{ matrix.database-user }}
@@ -60,15 +60,6 @@ jobs:
         POSTGRES_PORT: ${{ matrix.database-port }}
         POSTGRES_DB: ${{ matrix.database-name }}
       run: |
-        export DATABASE_URL=postgres://${{ matrix.database-user }}:${{ matrix.database-password }}@${{ matrix.database-host }}:${{ matrix.database-port }}/${{ matrix.database-name }}
-        export SECRET_KEY=test-secret-key
-        export DEBUG=1
-    - name: Run migrations
-      run: |
-        export DATABASE_URL=postgres://${{ matrix.database-user }}:${{ matrix.database-password }}@${{ matrix.database-host }}:${{ matrix.database-port }}/${{ matrix.database-name }}
-        export DJANGO_SECRET_KEY=test-secret-key
-        export DJANGO_DEBUG=1
-        export DJANGO_ALLOWED_HOSTS=localhost
         export GITHUB_WORKFLOW=True
         export MODE=workflow
         python prism/manage.py makemigrations
