@@ -2,16 +2,16 @@
     <header class="header-global">
         <nav id="navbar-main" aria-label="Primary navigation" class="navbar navbar-main navbar-expand-lg navbar-theme-primary headroom navbar-dark">
             <div class="container position-relative">
-                <a class="navbar-brand me-lg-5" href="./index.html">
-                    <img class="navbar-brand-dark" src="{{ ASSETS_ROOT }}/img/brand/light.svg" alt="Logo light">
-                    <img class="navbar-brand-light" src="{{ ASSETS_ROOT }}/img/brand/dark.svg" alt="Logo dark">
+                <a class="navbar-brand me-lg-5" href="{% url 'home' %}">
+                    <img class="navbar-brand-dark" src="{{ ASSETS_ROOT }}/img/brand/logo-main-dark.png" style="height: 100px" alt="Logo light">
+                    <img class="navbar-brand-light" src="{{ ASSETS_ROOT }}/img/brand/logo-main-light.png" style="height: 100px" alt="Logo dark">
                 </a>
                 <div class="navbar-collapse collapse me-auto" id="navbar_global">
                     <div class="navbar-collapse-header">
                         <div class="row">
                             <div class="col-6 collapse-brand">
-                                <a href="./index.html">
-                                    <img src="{{ ASSETS_ROOT }}/img/brand/dark.svg" alt="Themesberg logo">
+                                <a href="{% url 'home' %}">
+                                    <img src="{{ ASSETS_ROOT }}/img/brand/logo-main-light.png" style="height: 100px" alt="Logo">
                                 </a>
                             </div>
                             <div class="col-6 collapse-close">
@@ -26,6 +26,7 @@
                             <i class="fas fa-angle-down nav-link-arrow ml-2"></i>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkMain">
+                                <li><a class="dropdown-item" href="{% url 'home' %}">Manage</a></li>
                                 <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" id="navbarDropdownMenuLinkAdd" href="#">Create<i class="fas fa-angle-down nav-link-arrow ml-2"></i></a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkAdd">
                                         <li><a class="dropdown-item" href="{% url 'crypto:create_pass' %}">Password</a></li>
@@ -33,7 +34,6 @@
                                         <li><a class="dropdown-item" href="{% url 'crypto:create_ssh' %}">SSH Keypair</a></li>
                                     </ul>
                                 </li>
-                                <li><a class="dropdown-item" href="#">Manage</a></li>
                                 <li><a class="dropdown-item" href="#">Share</a></li>
                             </ul>
                         </li>

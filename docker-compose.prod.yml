@@ -46,28 +46,16 @@ services:
         soft: 128000
         hard: 128000
 
-  nginx:
-    build: ./nginx
-    links:
-      - web
-    volumes:
-      - static_volume:/home/prism/web/staticfiles
-      - media_volume:/home/prism/web/mediafiles
-    ports:
-      - 1337:80
-    depends_on:
-      - web
-
 volumes:
   static_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ./data/static
+      device: ./data/staticfiles
   media_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ./data/media
+      device: ./data/mediafiles
