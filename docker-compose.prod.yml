@@ -28,8 +28,8 @@ services:
     ports:
       - 127.0.0.1:8000:8000
     volumes:
-      - static_volume:/home/prism/web/staticfiles
-      - media_volume:/home/prism/web/mediafiles
+      - ./cdn/staticfiles:/home/prism/web/staticfiles
+      - ./cdn/mediafiles:/home/prism/web/mediafiles
     env_file:
       - .env
     restart: on-failure:5
@@ -45,17 +45,3 @@ services:
       nofile:
         soft: 128000
         hard: 128000
-
-volumes:
-  static_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./data/staticfiles
-  media_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./data/mediafiles
