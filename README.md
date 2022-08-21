@@ -36,6 +36,8 @@ DJANGO_DEBUG=False
 DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0
 DJANGO_SSL_ENABLED=False
 
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
 POSTGRES_DB=prism_database
 POSTGRES_USER=prism_user
 POSTGRES_PASSWORD=prism_password
@@ -46,6 +48,10 @@ POSTGRES_PASSWORD=prism_password
 `DJANGO_ALLOWED_HOSTS` - List of available hosts for which the application will be available. Set your domain name separated by a space **only if you have it**.
 
 `DJANGO_SSL_ENABLED` -  Set `True` **only** if you have an **SSL-ready** NGINX (or another) proxy server.
+
+`POSTGRES_HOST` - Database host address.
+
+`POSTGRES_PORT` - Database port.
 
 `POSTGRES_DB` - Database name.
 
@@ -75,7 +81,7 @@ docker-compose -f docker-compose.prod.yml build
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-Otherwise, you can start the whole cluster with included NGINX-server
+Otherwise, you can start application with included NGINX-server
 ```bash 
 docker-compose -f docker-compose.nginx.yml build
 docker-compose -f docker-compose.nginx.yml up -d
@@ -83,7 +89,7 @@ docker-compose -f docker-compose.nginx.yml up -d
 
 ### Setup superuser
 
-We must create a django superuser to manage user accounts.
+Create a django superuser to manage user accounts.
 ```bash 
 docker-compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
 ```
