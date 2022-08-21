@@ -1,19 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 
-from .models import PrismUser
+from backports.zoneinfo import available_timezones
+
+from .models import PrismProfile, PrismUser
 
 from apps.crypto.forms import FernetField
-
-class PrismUserCreationForm(UserCreationForm):
-    class Meta:
-        model = PrismUser
-        fields = ('username', 'email')
-
-class PrismUserChangeForm(UserChangeForm):
-    class Meta:
-        model = PrismUser
-        fields = ('username', 'email')
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -39,6 +31,113 @@ class LoginForm(forms.Form):
             }
         )
     )
+
+class RegisterForm(UserCreationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Username",
+                "class": "form-control"
+            }
+        ))
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                "placeholder": "Email",
+                "class": "form-control"
+            }
+        ))
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Password",
+                "class": "form-control"
+            }
+        ))
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Password check",
+                "class": "form-control"
+            }
+        ))
+
+    class Meta:
+        model = PrismUser
+        fields = ('username', 'email', 'password1', 'password2')
+
+class UserForm(UserChangeForm):
+    password = None
+    username = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Username",
+                "class": "form-control"
+            }
+        ))
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                "placeholder": "Email",
+                "class": "form-control"
+            }
+        ))
+    class Meta:
+        model = PrismUser
+        fields = ('username', 'email')
+        exclude = ('password', )
+
+class ProfileForm(forms.ModelForm):
+    timezone = forms.ChoiceField(
+        choices=sorted(
+            (i, i) for i in available_timezones()
+        ),
+        widget=forms.Select(
+            attrs={
+                "placeholder": "Timezone",
+                "class": "form-control"
+            }
+        ))
+    avatar = forms.ImageField(
+        widget=forms.FileInput(
+            attrs={
+                "placeholder": "Avatar",
+                "class": "form-control"
+            }
+        ))
+    class Meta:
+        model = PrismProfile
+        fields = ('timezone', 'avatar',)
+
+class PasswordForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+            }
+        )
+    )
+
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+            }
+        )
+    )
+
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+            }
+        )
+    )
+
+    class Meta:
+        fields = ('old_password', 'new_password1', 'new_password2',)
+
 
 class EncryptionKeyForm(forms.Form):
     key = FernetField(

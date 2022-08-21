@@ -1,13 +1,14 @@
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import CreateView
+from django.views import View
 from django.conf import settings
+from django.urls import reverse_lazy
 
 from apps.crypto.base import CryptoManager
-from .forms import EncryptionKeyForm, LoginForm
-
-from django.views import View
+from .forms import EncryptionKeyForm, LoginForm, PasswordForm, UserForm, ProfileForm, RegisterForm
 
 import datetime
 
@@ -16,7 +17,11 @@ class LoginView(View):
 
     def get(self, request, *args, **kwargs):
         form = LoginForm()
-        return render(request, self.template_name, {"form": form})
+        context = {
+            'form': form,
+            'registration': settings.REGISTRATION_ENABLED
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
@@ -35,8 +40,12 @@ class LoginView(View):
                 msg = 'Invalid credentials'
         else:
             msg = 'Error validating the form'
-
-        return render(request, self.template_name, {"form": form, "msg": msg})
+        context = {
+            'form': form,
+            'msg': msg,
+            'registration': settings.REGISTRATION_ENABLED
+        }
+        return render(request, self.template_name, context)
 
 class LogoutView(View):
     def get(self, request, *args, **kwargs):
@@ -46,6 +55,64 @@ class LogoutView(View):
             'prism_key'
         )
         return response
+
+class SignUpView(CreateView):
+    template_name = 'accounts/register.html'
+    success_url = reverse_lazy('accounts:login')
+    form_class = RegisterForm
+
+class ProfileView(LoginRequiredMixin, View):
+    template_name = 'accounts/profile.html'
+
+    def get(self, request, *args, **kwargs):
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+        context = {
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "user": request.user,
+            "profile": request.user.profile
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+        context = {
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "user": request.user,
+            "profile": request.user.profile
+        }
+        return render(request, self.template_name, context)
+
+class PasswordView(LoginRequiredMixin, View):
+    template_name = 'accounts/password.html'
+
+    def get(self, request, *args, **kwargs):
+        form = PasswordForm(request.user)
+        context = {
+            "form": form,
+            "user": request.user,
+            "profile": request.user.profile
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = PasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('accounts:profile')
+        context = {
+            "form": form,
+            "user": request.user,
+            "profile": request.user.profile
+        }
+        return render(request, self.template_name, context)
 
 class EncryptionKeyView(LoginRequiredMixin, View):
     template_name = "accounts/encryption_key.html"

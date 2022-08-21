@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from cryptography.fernet import InvalidToken
 
-from backports.zoneinfo import available_timezones, ZoneInfo
+from backports.zoneinfo import ZoneInfo
 
 from .models import EncryptedPassword, EncryptedSocialAccount, EncryptedSSHKeypair
 from .base import CryptoManager, BaseEncryptedObject
@@ -36,7 +36,7 @@ class SecretsView(LoginRequiredMixin, View):
                 secrets.append((
                     el.title,
                     el._meta.verbose_name,
-                    el.date_created.astimezone(ZoneInfo(user.timezone)),
+                    el.date_created.astimezone(ZoneInfo(user.profile.timezone)),
                     el.get_absolute_url(),
                     el.get_delete_url(),
                 ))

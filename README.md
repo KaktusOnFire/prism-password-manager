@@ -35,6 +35,7 @@ DJANGO_SECRET_KEY='secret_key'
 DJANGO_DEBUG=False
 DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0
 DJANGO_SSL_ENABLED=False
+DJANGO_REGISTRATION_ENABLED=True
 
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
@@ -48,6 +49,8 @@ POSTGRES_PASSWORD=prism_password
 `DJANGO_ALLOWED_HOSTS` - List of available hosts for which the application will be available. Set your domain name separated by a space **only if you have it**.
 
 `DJANGO_SSL_ENABLED` -  Set `True` **only** if you have an **SSL-ready** NGINX (or another) proxy server.
+
+`DJANGO_REGISTRATION_ENABLED` -  Allows users to create their own accounts. Set `False` to manage user accounts by your own.
 
 `POSTGRES_HOST` - Database host address.
 

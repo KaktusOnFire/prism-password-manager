@@ -61,6 +61,14 @@
                                 <div class="d-grid">
                                     <button type="submit" name="login" class="btn btn-primary">Sign in</button>
                                 </div>
+
+                                {% if registration %}
+                                <div class="alert alert-light text-center" role="alert">
+                                    <span>
+                                        Don't have an account yet? <a href="{% url 'accounts:register' %}" class="alert-link">Create it</a>
+                                    </span>
+                                </div>
+                                {% endif %}
                             </form>
 
                             <br />
