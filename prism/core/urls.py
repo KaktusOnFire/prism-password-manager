@@ -28,5 +28,10 @@ urlpatterns = [
     path('', SecretsView.as_view(), name='home'),
 ]
 
+handler404 = 'core.views.page_not_found_view'
+handler500 = 'core.views.server_error_view'
+handler403 = 'core.views.permission_denied_view'
+handler400 = 'core.views.bad_request_view'
+
 if bool(settings.DEBUG):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

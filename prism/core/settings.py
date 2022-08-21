@@ -88,8 +88,8 @@ DATABASES = {
         "NAME": os.environ.get("POSTGRES_DB", "prism"),
         "USER": os.environ.get("POSTGRES_USER", "user"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
-        "HOST": os.environ.get("POSTGRES_HOST", "db"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        "HOST": "db",
+        "PORT": 5432,
     }
 }
 

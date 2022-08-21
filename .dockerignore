@@ -1,3 +1,5 @@
 data
 tests
 venv
+./src
+./cdn

@@ -27,11 +27,11 @@ services:
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
     ports:
       - 127.0.0.1:8000:8000
+    volumes:
+      - ./cdn/staticfiles:/usr/src/app/staticfiles
+      - ./cdn/mediafiles:/usr/src/app/mediafiles
     env_file:
       - .env
-    volumes:
-      - ./data/staticfiles:/usr/src/app/staticfiles
-      - ./data/mediafiles:/usr/src/app/mediafiles
     restart: on-failure:5
     depends_on:
       db:

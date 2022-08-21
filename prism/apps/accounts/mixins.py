@@ -17,7 +17,7 @@ class KeyCookieRequiredMixin(AccessMixin):
             Fernet(encryption_key)
         except (KeyError, ValueError, BadSignature, SignatureExpired):
             path = self.request.get_full_path()
-            key_update_url = reverse('accounts:updatepk')
+            key_update_url = reverse('accounts:key')
             return redirect_to_login(
                 path,
                 key_update_url,
