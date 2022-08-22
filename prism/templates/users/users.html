@@ -1,0 +1,130 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} User management {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+
+        <div class="section-header pb-1 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 text-center">
+                        <h1 class="display-3 mb-4">Users</h1>
+                        <p class="lead mb-5">User management panel</p>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <section class="section section-lg pt-3 pb-0">
+            <div class="container">                
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    {{ form.query }}
+                                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                                    <a href="{% url 'users:create' %}" class="btn btn-outline-secondary">
+                                        Create User
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-lg pt-3">
+            <div class="container">                
+                <div class="row justify-content-center mb-5 mb-lg-6">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Last Login</th>
+                                    <th scope="col">Date Created</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for el in users.object_list  %}
+                                <tr>
+                                    <td scope="row">{{ el.0 }}</td>
+                                    <td>{{ el.1|date:"d/m/Y G:i T" }}</td>
+                                    <td>{{ el.2|date:"d/m/Y G:i T" }}</td>
+                                    <td>{{ el.3 }}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <div class="p-2">
+                                                <a href="{{ el.4 }}" class="btn btn-primary mb-2 mr-2">Reset Password</a>
+                                            </div>
+                                            {% if el.3 %}
+                                            <div class="p-2">
+                                                <a href="{{ el.4 }}?action=disable" class="btn btn-danger mb-2 mr-2">Disable</a>
+                                            </div>
+                                            {% else %}
+                                            <div class="p-2">
+                                                <a href="{{ el.4 }}?action=enable" class="btn btn-success mb-2 mr-2">Enable</a>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        {% if users.has_other_pages %}
+                        <ul class="pagination justify-content-center">
+                            {% if users.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ users.previous_page_number }}">&laquo;</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            
+                            {% if users.number|add:'-7' > 1 %}
+                                <li class="page-item"><a class="page-link" href="?page={{ users.number|add:'-8' }}">&hellip;</a></li>
+                            {% endif %}
+
+                            {% for i in users.paginator.page_range %}
+                            {% if users.number == i %}
+                                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+                            {% elif i > users.number|add:'-8' and i < users.number|add:'8' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if users.paginator.num_pages > users.number|add:'7' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ users.number|add:'8' }}">&hellip;</a></li>
+                            {% endif %}
+                            
+                            {% if users.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ users.next_page_number }}">&raquo;</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- {% include 'includes/footer-about.html' %} -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

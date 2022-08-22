@@ -10,7 +10,7 @@
     <main>
 
         <!-- Section -->
-        <section class="min-vh-100 d-flex align-items-center section-image overlay-soft-dark" data-background="{{ ASSETS_ROOT }}/img/pages/form-image.jpg">
+        <section class="min-vh-100 d-flex align-items-center animated-gradient">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-12 d-flex align-items-center justify-content-center">
@@ -65,7 +65,7 @@
                                 {% if registration %}
                                 <div class="alert alert-light text-center" role="alert">
                                     <span>
-                                        Don't have an account yet? <a href="{% url 'accounts:register' %}" class="alert-link">Create it</a>
+                                        Don't have an account yet? <a href="{% url 'authentication:register' %}" class="alert-link">Create it</a>
                                     </span>
                                 </div>
                                 {% endif %}

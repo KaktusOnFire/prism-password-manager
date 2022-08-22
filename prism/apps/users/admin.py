@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .forms import RegisterForm
+from apps.authentication.forms import RegisterForm
 from .models import PrismUser, PrismProfile
 
 class PrismUserAdmin(UserAdmin):

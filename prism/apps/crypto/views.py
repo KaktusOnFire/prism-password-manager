@@ -13,7 +13,7 @@ from .models import EncryptedPassword, EncryptedSocialAccount, EncryptedSSHKeypa
 from .base import CryptoManager, BaseEncryptedObject
 from .forms import PasswordForm, SSHKeypairForm, SocialAccountForm, SecretSearchForm
 
-from apps.accounts.mixins import KeyCookieRequiredMixin
+from apps.users.mixins import KeyCookieRequiredMixin
 
 def get_encryption_key(request):
     try:
@@ -63,8 +63,8 @@ class SecretsView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = SecretSearchForm(request.POST)
+        secrets = list()
         if form.is_valid():
-            secrets = list()
             query = form.cleaned_data["query"]
             categories = form.cleaned_data["category"]
             if len(categories) > 0:

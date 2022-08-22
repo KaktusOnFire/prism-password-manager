@@ -1,71 +1,27 @@
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
+from django.views.generic import CreateView
 from django.conf import settings
 from django.urls import reverse_lazy
 
 from apps.crypto.base import CryptoManager
-from .forms import EncryptionKeyForm, LoginForm, PasswordEditForm, UserEditForm, ProfileEditForm, RegisterForm
+from apps.authentication.forms import RegisterForm
+from .mixins import StaffRequiredMixin
+from .models import PrismUser
+from .forms import EncryptionKeyForm, \
+    PasswordResetForm, UserEditForm, \
+    ProfileEditForm, UserSearchForm, \
+    PasswordEditForm
 
 import datetime
-
-class LoginView(View):
-    template_name = "accounts/login.html"
-
-    def get(self, request, *args, **kwargs):
-        form = LoginForm()
-        context = {
-            'form': form,
-            'registration': settings.REGISTRATION_ENABLED
-        }
-        return render(request, self.template_name, context)
-
-    def post(self, request, *args, **kwargs):
-        form = LoginForm(request.POST)
-        msg = None
-        if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            remember_me = form.cleaned_data.get("remember_me")
-            user = authenticate(username=username, password=password)
-            if user:
-                if user.is_active:   
-                    login(request, user)
-                    if not remember_me:
-                        request.session.set_expiry(0)
-                    return redirect(self.request.GET.get('next', "/"))
-                else:
-                    msg = 'Account is disabled'
-            else:
-                msg = 'Invalid credentials'
-        else:
-            msg = 'Error validating the form'
-        context = {
-            'form': form,
-            'msg': msg,
-            'registration': settings.REGISTRATION_ENABLED
-        }
-        return render(request, self.template_name, context)
-
-class LogoutView(View):
-    def get(self, request, *args, **kwargs):
-        logout(request)
-        response = redirect('accounts:login')
-        response.delete_cookie(
-            'prism_key'
-        )
-        return response
-
-class SignUpView(CreateView):
-    template_name = 'accounts/register.html'
-    success_url = reverse_lazy('accounts:login')
-    form_class = RegisterForm
+from backports.zoneinfo import ZoneInfo
 
 class ProfileView(LoginRequiredMixin, View):
-    template_name = 'accounts/profile.html'
+    template_name = 'users/profile.html'
 
     def get(self, request, *args, **kwargs):
         user_form = UserEditForm(instance=request.user)
@@ -93,7 +49,7 @@ class ProfileView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 class PasswordView(LoginRequiredMixin, View):
-    template_name = 'accounts/password.html'
+    template_name = 'users/password.html'
 
     def get(self, request, *args, **kwargs):
         form = PasswordEditForm(request.user)
@@ -109,7 +65,7 @@ class PasswordView(LoginRequiredMixin, View):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            return redirect('accounts:profile')
+            return redirect('users:profile')
         context = {
             "form": form,
             "user": request.user,
@@ -117,8 +73,131 @@ class PasswordView(LoginRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
+class UsersView(LoginRequiredMixin, StaffRequiredMixin, View):
+    template_name = 'users/users.html'
+    PAGINATE_BY = 10
+
+    def get(self, request, *args, **kwargs):
+        form = UserSearchForm()
+        users_qs = PrismUser.objects.all().order_by("username")
+        users = list()
+        for el in users_qs:
+            if el.last_login:
+                users.append((
+                    el.username,
+                    el.last_login.astimezone(ZoneInfo(request.user.profile.timezone)),
+                    el.date_joined.astimezone(ZoneInfo(request.user.profile.timezone)),
+                    el.is_active,
+                    el.get_absolute_url(),
+                ))
+            else:
+                users.append((
+                    el.username,
+                    "-",
+                    el.date_joined.astimezone(ZoneInfo(request.user.profile.timezone)),
+                    el.is_active,
+                    el.get_absolute_url(),
+                ))
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(users, self.PAGINATE_BY)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+        context = {
+            "form": form,
+            "users": data,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = UserSearchForm(request.POST)
+        users = list()
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+
+            if query != "":
+                users_qs = PrismUser.objects.filter(username__icontains=query).order_by("username")
+            else:
+                users_qs = PrismUser.objects.all().order_by("username")
+            for el in users_qs:
+                users.append((
+                    el.username,
+                    el.last_login.astimezone(ZoneInfo(request.user.profile.timezone)),
+                    el.date_joined.astimezone(ZoneInfo(request.user.profile.timezone)),
+                    el.is_active,
+                    el.get_absolute_url(),
+                ))
+
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(users, self.PAGINATE_BY)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+        context = {
+            "form": form,
+            "users": data,
+        }
+        return render(request, self.template_name, context)
+
+class CreateUserView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    template_name = 'users/create.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy("users:manager")
+
+class ResetUserView(LoginRequiredMixin, StaffRequiredMixin, View):
+    template_name = 'users/password_reset.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        user = get_object_or_404(PrismUser, id=pk)
+        if pk == request.user.pk:
+            return redirect("users:manager")
+
+        action = request.GET.get("action")
+        if action:
+            if action == "disable":
+                user.is_active = False
+                user.save()
+            if action == "enable":
+                user.is_active = True
+                user.save()
+            return redirect("users:manager")
+        else:
+            form = PasswordResetForm(user=user)
+            context = {
+                "form": form,
+                "user": user
+            }
+            return render(request, self.template_name, context)
+
+    def post(self, request, pk, *args, **kwargs):
+        user = get_object_or_404(PrismUser, id=pk)
+        if pk == request.user.pk:
+            return redirect("users:manager")
+
+        form = PasswordResetForm(user=user, data=request.POST)
+        if form.is_valid():
+            password = form.cleaned_data["new_password1"]
+            user.set_password(password)
+            user.save()
+            return redirect("users:manager")
+        
+        context = {
+            "form": form,
+            "user": user
+        }
+        return render(request, self.template_name, context)
+        
+
 class EncryptionKeyView(LoginRequiredMixin, View):
-    template_name = "accounts/encryption_key.html"
+    template_name = "users/encryption_key.html"
 
     def get(self, request, *args, **kwargs):
         signer = TimestampSigner()

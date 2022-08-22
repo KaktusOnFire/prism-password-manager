@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.deconstruct import deconstructible
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 
 import uuid
 import os
@@ -27,6 +28,9 @@ class PrismUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def get_absolute_url(self):
+        return reverse('users:edit', kwargs={'pk' : self.pk})
 
 class PrismProfile(models.Model):
     user = models.OneToOneField(PrismUser, on_delete=models.CASCADE, primary_key=True, related_name='profile')

@@ -17,10 +17,16 @@ class KeyCookieRequiredMixin(AccessMixin):
             Fernet(encryption_key)
         except (KeyError, ValueError, BadSignature, SignatureExpired):
             path = self.request.get_full_path()
-            key_update_url = reverse('accounts:key')
+            key_update_url = reverse('users:key')
             return redirect_to_login(
                 path,
                 key_update_url,
                 self.redirect_field_name
             )
         return super().dispatch(request, *args, **kwargs)
+
+class StaffRequiredMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return self.handle_no_permission()
+        return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)

@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'apps.accounts',
+    'apps.authentication',
+    'apps.users',
     'apps.crypto',
 
     'django_cleanup.apps.CleanupConfig'
@@ -93,7 +94,7 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'accounts.PrismUser'
+AUTH_USER_MODEL = 'users.PrismUser'
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
