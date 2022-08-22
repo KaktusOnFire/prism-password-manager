@@ -9,19 +9,38 @@ PRISM is a [Django](https://www.djangoproject.com/)-based secured password manag
 Every secret is encrypted using [Fernet](https://cryptography.io/en/latest/fernet/) symmetric encryption
 
 - [Requirements](#requirements)
+- [Features](#features)
+- [Website](#website)
+- [Usage](#usage)
 - [Deployment](#deployment)
    - [Environment Variables](#environment-variables)
    - [Static files](#staticfiles)
    - [Start containers](#start-containers)
    - [Setup superuser](#setup-superuser)
-- [Usage](#usage)
-- [Demo](#demo)
 - [Security note](#security-note)
 - [Bugs](#bugs)
 
 ## Requirements
 * Docker (with docker-compose)
 * (optional) SSL-ready NGINX server
+
+## Features
+
+- Fernet-based symmetric encryption of each secret
+- Encrypted cookies (for master key caching)
+- SSL-ready
+- Cross-platform
+- Fast deployment
+
+## Website
+
+PRISM is now available at **https://prism.kaktusdev.ru/**
+
+## Usage
+
+* Register at `/auth/register`
+* Generate your encryption key on `/auth/key` page. **Don't forget to save it.**
+* Start saving you secrets
 
 ## Deployment
 
@@ -96,16 +115,6 @@ Create a django superuser to manage user accounts.
 ```bash 
 docker-compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
 ```
-
-## Usage
-
-* Register at `/auth/register`
-* Generate your encryption key on `/auth/key` page. **Don't forget to save it.**
-* Start saving you secrets
-
-## Demo
-
-You can test this application at public ssl-protected host at https://prism.kaktusdev.ru/
 
 ## Security note
 
