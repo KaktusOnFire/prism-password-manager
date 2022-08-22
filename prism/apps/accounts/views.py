@@ -8,7 +8,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 
 from apps.crypto.base import CryptoManager
-from .forms import EncryptionKeyForm, LoginForm, PasswordForm, UserForm, ProfileForm, RegisterForm
+from .forms import EncryptionKeyForm, LoginForm, PasswordEditForm, UserEditForm, ProfileEditForm, RegisterForm
 
 import datetime
 
@@ -32,10 +32,13 @@ class LoginView(View):
             remember_me = form.cleaned_data.get("remember_me")
             user = authenticate(username=username, password=password)
             if user:
-                login(request, user)
-                if not remember_me:
-                    request.session.set_expiry(0)
-                return redirect(self.request.GET.get('next', "/"))
+                if user.is_active:   
+                    login(request, user)
+                    if not remember_me:
+                        request.session.set_expiry(0)
+                    return redirect(self.request.GET.get('next', "/"))
+                else:
+                    msg = 'Account is disabled'
             else:
                 msg = 'Invalid credentials'
         else:
@@ -65,8 +68,8 @@ class ProfileView(LoginRequiredMixin, View):
     template_name = 'accounts/profile.html'
 
     def get(self, request, *args, **kwargs):
-        user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm(instance=request.user.profile)
+        user_form = UserEditForm(instance=request.user)
+        profile_form = ProfileEditForm(instance=request.user.profile)
         context = {
             "user_form": user_form,
             "profile_form": profile_form,
@@ -76,8 +79,8 @@ class ProfileView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        user_form = UserEditForm(request.POST, instance=request.user)
+        profile_form = ProfileEditForm(request.POST, request.FILES, instance=request.user.profile)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -93,7 +96,7 @@ class PasswordView(LoginRequiredMixin, View):
     template_name = 'accounts/password.html'
 
     def get(self, request, *args, **kwargs):
-        form = PasswordForm(request.user)
+        form = PasswordEditForm(request.user)
         context = {
             "form": form,
             "user": request.user,
@@ -102,7 +105,7 @@ class PasswordView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        form = PasswordForm(request.user, request.POST)
+        form = PasswordEditForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)

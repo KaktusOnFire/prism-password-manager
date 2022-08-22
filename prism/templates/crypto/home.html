@@ -20,8 +20,33 @@
             </div>
         </div> 
 
+        <section class="section section-lg pt-3 pb-0">
+            <div class="container">                
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    {{ form.query }}
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Filter</button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <div class="dropdown-item container">
+                                            {{ form.category }}
+                                        </div>
+                                    </ul>
+                                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="section section-lg pt-3">
-            <div class="container">
+            <div class="container">                
                 <div class="row justify-content-center mb-5 mb-lg-6">
                     <div class="col-12 table-responsive">
                         <table class="table table-hover">
@@ -34,7 +59,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for el in secrets %}
+                                {% for el in secrets.object_list  %}
                                 <tr>
                                     <td scope="row">{{ el.0 }}</td>
                                     <td>{{ el.1 }}</td>
@@ -53,6 +78,38 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        
+                        {% if secrets.has_other_pages %}
+                        <ul class="pagination justify-content-center">
+                            {% if secrets.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ secrets.previous_page_number }}">&laquo;</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            
+                            {% if secrets.number|add:'-7' > 1 %}
+                                <li class="page-item"><a class="page-link" href="?page={{ secrets.number|add:'-8' }}">&hellip;</a></li>
+                            {% endif %}
+
+                            {% for i in secrets.paginator.page_range %}
+                            {% if secrets.number == i %}
+                                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+                            {% elif i > secrets.number|add:'-8' and i < secrets.number|add:'8' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if secrets.paginator.num_pages > secrets.number|add:'7' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ secrets.number|add:'8' }}">&hellip;</a></li>
+                            {% endif %}
+                            
+                            {% if secrets.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ secrets.next_page_number }}">&raquo;</a></li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>

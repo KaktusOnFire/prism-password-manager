@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import ModelForm, ValidationError
+
+from .base import BaseEncryptedObject
 from .models import EncryptedPassword, EncryptedSocialAccount, EncryptedSSHKeypair
+
 from cryptography.fernet import Fernet
 
 class FernetField(forms.CharField):
@@ -14,6 +17,24 @@ class FernetField(forms.CharField):
         except ValueError:
             raise ValidationError("Encryption key must be a base64-encoded 32-byte key.")
         super().validate(value)
+
+class SecretSearchForm(forms.Form):
+    query = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Search",
+                "class": "form-control",
+            }
+        )
+    )
+    category = forms.MultipleChoiceField(
+        required=False,
+        choices=(
+            (i._meta.verbose_name, i._meta.verbose_name) for i in BaseEncryptedObject.__subclasses__()
+        ),
+        widget=forms.CheckboxSelectMultiple
+    )
 
 class PasswordForm(ModelForm):
     title = forms.CharField(

@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
+from django.core.files.images import get_image_dimensions
 
 from backports.zoneinfo import available_timezones
 
@@ -66,7 +67,7 @@ class RegisterForm(UserCreationForm):
         model = PrismUser
         fields = ('username', 'email', 'password1', 'password2')
 
-class UserForm(UserChangeForm):
+class UserEditForm(UserChangeForm):
     password = None
     username = forms.CharField(
         max_length=100,
@@ -88,7 +89,7 @@ class UserForm(UserChangeForm):
         fields = ('username', 'email')
         exclude = ('password', )
 
-class ProfileForm(forms.ModelForm):
+class ProfileEditForm(forms.ModelForm):
     timezone = forms.ChoiceField(
         choices=sorted(
             (i, i) for i in available_timezones()
@@ -110,7 +111,42 @@ class ProfileForm(forms.ModelForm):
         model = PrismProfile
         fields = ('timezone', 'avatar',)
 
-class PasswordForm(PasswordChangeForm):
+    def clean_avatar(self):
+        avatar = self.cleaned_data['avatar']
+
+        try:
+            w, h = get_image_dimensions(avatar)
+
+            #validate dimensions
+            max_width = max_height = 500
+            if w > max_width or h > max_height:
+                raise forms.ValidationError(
+                    f'Please use an image that is {max_width} x {max_height} pixels or smaller.'
+                    )
+
+            #validate content type
+            main, sub = avatar.content_type.split('/')
+            if not (main == 'image' and sub in ['jpeg', 'pjpeg', 'gif', 'png']):
+                raise forms.ValidationError(
+                    'Please use a JPEG, GIF or PNG image.'
+                    )
+
+            #validate file size
+            if len(avatar) > (200 * 1024):
+                raise forms.ValidationError(
+                    'Avatar file size may not exceed 200k.'
+                    )
+
+        except AttributeError:
+            """
+            Handles case when we are updating the user profile
+            and do not supply a new avatar
+            """
+            pass
+
+        return avatar
+
+class PasswordEditForm(PasswordChangeForm):
     old_password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={

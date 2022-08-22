@@ -4,13 +4,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
-from cryptography.fernet import InvalidToken
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from cryptography.fernet import InvalidToken
 from backports.zoneinfo import ZoneInfo
 
 from .models import EncryptedPassword, EncryptedSocialAccount, EncryptedSSHKeypair
 from .base import CryptoManager, BaseEncryptedObject
-from .forms import PasswordForm, SSHKeypairForm, SocialAccountForm
+from .forms import PasswordForm, SSHKeypairForm, SocialAccountForm, SecretSearchForm
 
 from apps.accounts.mixins import KeyCookieRequiredMixin
 
@@ -25,10 +26,12 @@ def get_encryption_key(request):
 
 class SecretsView(LoginRequiredMixin, View):
     template_name = 'crypto/home.html'
+    PAGINATE_BY = 10
     
     def get(self, request, *args, **kwargs):
         user = request.user
         secrets = list()
+        form = SecretSearchForm()
         obj_classes = BaseEncryptedObject.__subclasses__()
         querysets = (el.objects.filter(owner=request.user) for el in obj_classes)
         for qs in querysets:
@@ -40,8 +43,67 @@ class SecretsView(LoginRequiredMixin, View):
                     el.get_absolute_url(),
                     el.get_delete_url(),
                 ))
+        secrets.sort(key=lambda date: date[2], reverse=True)
+
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(secrets, self.PAGINATE_BY)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
         context = {
-            "secrets": secrets
+            "secrets": data,
+            "form": form
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = SecretSearchForm(request.POST)
+        if form.is_valid():
+            secrets = list()
+            query = form.cleaned_data["query"]
+            categories = form.cleaned_data["category"]
+            if len(categories) > 0:
+                obj_classes = filter(
+                    lambda obj: obj._meta.verbose_name in categories,
+                    BaseEncryptedObject.__subclasses__()
+                )
+            else:
+                obj_classes = BaseEncryptedObject.__subclasses__()
+
+
+            if query != "":
+                querysets = (el.objects.filter(owner=request.user, title__icontains=query) for el in obj_classes)
+            else:
+                querysets = (el.objects.filter(owner=request.user) for el in obj_classes)
+            for qs in querysets:
+                for el in qs:
+                    secrets.append((
+                        el.title,
+                        el._meta.verbose_name,
+                        el.date_created.astimezone(ZoneInfo(request.user.profile.timezone)),
+                        el.get_absolute_url(),
+                        el.get_delete_url(),
+                    ))
+            secrets.sort(key=lambda date: date[2], reverse=True)
+
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(secrets, self.PAGINATE_BY)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+
+        context = {
+            "form": form,
+            "secrets": data
         }
         return render(request, self.template_name, context)
 
