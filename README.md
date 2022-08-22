@@ -19,6 +19,7 @@ Every secret is encrypted using [Fernet](https://cryptography.io/en/latest/ferne
    - [Setup superuser](#setup-superuser)
 - [Security note](#security-note)
 - [Bugs](#bugs)
+- [Design](#design)
 
 ## Requirements
 * Docker (with docker-compose)
@@ -132,3 +133,7 @@ This is an example NGINX setup manual:
 ## Bugs
 
 If you discover any bugs or vulnerabilities, please report them in [Github Issues](https://github.com/KaktusOnFire/prism-password-manager/issues) or my [Telegram](https://t.me/KaktusOnFire).
+
+## Design
+
+Design by [AppSeed](https://appseed.us/)
