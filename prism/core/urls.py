@@ -22,7 +22,6 @@ from django.urls import path, include
 from apps.crypto.views import SecretsView
 
 urlpatterns = [
-    path('manager/', admin.site.urls),
     path('auth/', include(('apps.authentication.urls'), namespace='accounts')),
     path('users/', include('apps.users.urls')),
     path('secrets/', include('apps.crypto.urls')),
@@ -36,4 +35,5 @@ handler403 = 'core.views.permission_denied_view'
 handler400 = 'core.views.bad_request_view'
 
 if bool(settings.DEBUG):
+    urlpatterns += path('manager/', admin.site.urls),
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
