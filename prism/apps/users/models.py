@@ -32,8 +32,12 @@ class PrismUser(AbstractUser):
     def get_absolute_url(self):
         return reverse('users:edit', kwargs={'pk' : self.pk})
 
+    def get_delete_url(self):
+        return reverse('users:delete', kwargs={'pk' : self.pk})
+
 class PrismProfile(models.Model):
     user = models.OneToOneField(PrismUser, on_delete=models.CASCADE, primary_key=True, related_name='profile')
+    is_verified = models.BooleanField(_('email confirmed'), default=False)
     timezone = models.CharField(_('timezone'), max_length=100, default="UTC")
     avatar = models.ImageField(_('avatar'), upload_to=PathAndRename('avatars/'), null=True, blank=True)
 
@@ -48,6 +52,7 @@ class PrismProfile(models.Model):
 def create_profile(sender, instance, created, **kwargs):
     if created:
         PrismProfile.objects.create(user=instance)
+    instance.profile.save()
 
 
 # @receiver(post_save, sender=PrismUser)

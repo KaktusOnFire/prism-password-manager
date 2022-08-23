@@ -55,7 +55,12 @@ DJANGO_SECRET_KEY='secret_key'
 DJANGO_DEBUG=False
 DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0
 DJANGO_SSL_ENABLED=False
+
 DJANGO_REGISTRATION_ENABLED=True
+DJANGO_EMAIL_HOST=<your smtp server>
+DJANGO_EMAIL_USER=<your email username>
+DJANGO_EMAIL_FROM=<your email username>
+DJANGO_EMAIL_PASSWORD=<your email password>
 
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
@@ -70,7 +75,15 @@ POSTGRES_PASSWORD=prism_password
 
 `DJANGO_SSL_ENABLED` -  Set `True` **only** if you have an **SSL-ready** NGINX (or another) proxy server.
 
-`DJANGO_REGISTRATION_ENABLED` -  Allows users to create their own accounts. Set `False` to manage user accounts by your own.
+`DJANGO_REGISTRATION_ENABLED` -  Allows users to create their own accounts. Set `False` to manage user accounts by your own.  
+
+`DJANGO_EMAIL_HOST` - Mail server for sending email notifications.
+
+`DJANGO_EMAIL_USER` - Mail account username for sending email notifications.
+
+`DJANGO_EMAIL_FROM` - Same as `DJANGO_EMAIL_USER`.
+
+`DJANGO_EMAIL_PASSWORD` - Mail account password for sending email notifications.
 
 `POSTGRES_HOST` - Database host address.
 
@@ -81,6 +94,8 @@ POSTGRES_PASSWORD=prism_password
 `POSTGRES_USER` - Database username.
 
 `POSTGRES_PASSWORD` - Database password.
+
+**NOTE**: `DJANGO_EMAIL_*` parameters are required only if you have set `DJANGO_REGISTRATION_ENABLED` to `True`
 
 ### Staticfiles
 **If you a Windows user, you can skip this step.**

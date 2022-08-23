@@ -23,7 +23,7 @@ from apps.crypto.views import SecretsView
 
 urlpatterns = [
     path('manager/', admin.site.urls),
-    path('auth/', include('apps.authentication.urls')),
+    path('auth/', include(('apps.authentication.urls'), namespace='accounts')),
     path('users/', include('apps.users.urls')),
     path('secrets/', include('apps.crypto.urls')),
     path('', SecretsView.as_view(), name='home'),

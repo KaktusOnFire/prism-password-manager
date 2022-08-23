@@ -52,7 +52,8 @@
                                     <th scope="col">Username</th>
                                     <th scope="col">Last Login</th>
                                     <th scope="col">Date Created</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Account Status</th>
+                                    <th scope="col">Email Verified</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -62,21 +63,25 @@
                                     <td scope="row">{{ el.0 }}</td>
                                     <td>{{ el.1|date:"d/m/Y G:i T" }}</td>
                                     <td>{{ el.2|date:"d/m/Y G:i T" }}</td>
-                                    <td>{{ el.3 }}</td>
+                                    <td>{{ el.3|yesno:"Enabled,Disabled" }}</td>
+                                    <td>{{ el.4|yesno:"Yes,No"}}</td>
                                     <td>
                                         <div class="d-flex">
                                             <div class="p-2">
-                                                <a href="{{ el.4 }}" class="btn btn-primary mb-2 mr-2">Reset Password</a>
+                                                <a href="{{ el.5 }}" class="btn btn-primary mb-2 mr-2">Password</a>
                                             </div>
                                             {% if el.3 %}
                                             <div class="p-2">
-                                                <a href="{{ el.4 }}?action=disable" class="btn btn-danger mb-2 mr-2">Disable</a>
+                                                <a href="{{ el.5 }}?action=disable" class="btn btn-danger mb-2 mr-2">Disable</a>
                                             </div>
                                             {% else %}
                                             <div class="p-2">
-                                                <a href="{{ el.4 }}?action=enable" class="btn btn-success mb-2 mr-2">Enable</a>
+                                                <a href="{{ el.5 }}?action=enable" class="btn btn-success mb-2 mr-2">Enable</a>
                                             </div>
                                             {% endif %}
+                                            <div class="p-2">
+                                                <a href="{{ el.6 }}" class="btn btn-tertiary mb-2 mr-2">Delete</a>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>

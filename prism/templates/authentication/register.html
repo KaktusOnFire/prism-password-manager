@@ -25,6 +25,12 @@
                                 </span>
                             </div>
 
+                            {% if msg %}
+                            <div class="alert alert-info" role="alert">
+                                <span class="alert-inner--text">{{ msg }}</span>
+                            </div>
+                            {% endif %}
+
                             <form method="post" action="" action="#">
                                 {% csrf_token %}
                                 <div class="form-group mb-4">

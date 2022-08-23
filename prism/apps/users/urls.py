@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CreateUserView, ResetUserView, \
+from .views import CreateUserView, DeleteUserView, ResetUserView, \
     PasswordView, EncryptionKeyView, \
     ProfileView, UsersView
 
@@ -14,5 +14,6 @@ urlpatterns = [
     #Admin urls
     path('manager', UsersView.as_view(), name="manager"),
     path('create', CreateUserView.as_view(), name="create"),
+    path('delete/<uuid:pk>', DeleteUserView.as_view(), name="delete"),
     path('edit/<uuid:pk>', ResetUserView.as_view(), name="edit"),
 ]

@@ -4,7 +4,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DeleteView
 from django.conf import settings
 from django.urls import reverse_lazy
 
@@ -79,7 +79,7 @@ class UsersView(LoginRequiredMixin, StaffRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         form = UserSearchForm()
-        users_qs = PrismUser.objects.all().order_by("username")
+        users_qs = PrismUser.objects.exclude(id=request.user.pk).order_by("username")
         users = list()
         for el in users_qs:
             if el.last_login:
@@ -88,7 +88,9 @@ class UsersView(LoginRequiredMixin, StaffRequiredMixin, View):
                     el.last_login.astimezone(ZoneInfo(request.user.profile.timezone)),
                     el.date_joined.astimezone(ZoneInfo(request.user.profile.timezone)),
                     el.is_active,
+                    el.profile.is_verified,
                     el.get_absolute_url(),
+                    el.get_delete_url(),
                 ))
             else:
                 users.append((
@@ -96,7 +98,9 @@ class UsersView(LoginRequiredMixin, StaffRequiredMixin, View):
                     "-",
                     el.date_joined.astimezone(ZoneInfo(request.user.profile.timezone)),
                     el.is_active,
+                    el.profile.is_verified,
                     el.get_absolute_url(),
+                    el.get_delete_url(),
                 ))
 
         page = request.GET.get('page', 1)
@@ -120,16 +124,18 @@ class UsersView(LoginRequiredMixin, StaffRequiredMixin, View):
             query = form.cleaned_data["query"]
 
             if query != "":
-                users_qs = PrismUser.objects.filter(username__icontains=query).order_by("username")
+                users_qs = PrismUser.objects.exclude(id=request.user.pk).filter(username__icontains=query).order_by("username")
             else:
-                users_qs = PrismUser.objects.all().order_by("username")
+                users_qs = PrismUser.objects.exclude(id=request.user.pk).order_by("username")
             for el in users_qs:
                 users.append((
                     el.username,
                     el.last_login.astimezone(ZoneInfo(request.user.profile.timezone)),
                     el.date_joined.astimezone(ZoneInfo(request.user.profile.timezone)),
                     el.is_active,
+                    el.profile.is_verified,
                     el.get_absolute_url(),
+                    el.get_delete_url(),
                 ))
 
 
@@ -151,6 +157,11 @@ class CreateUserView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     template_name = 'users/create.html'
     form_class = RegisterForm
     success_url = reverse_lazy("users:manager")
+
+class DeleteUserView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    template_name = 'users/delete.html'
+    success_url = reverse_lazy("users:manager")
+    model = PrismUser
 
 class ResetUserView(LoginRequiredMixin, StaffRequiredMixin, View):
     template_name = 'users/password_reset.html'
