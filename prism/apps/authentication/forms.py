@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from captcha.fields import CaptchaField
 
 from apps.users.models import PrismUser
 
@@ -27,6 +28,7 @@ class LoginForm(forms.Form):
             }
         )
     )
+    captcha = CaptchaField()
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(
@@ -57,6 +59,7 @@ class RegisterForm(UserCreationForm):
                 "class": "form-control"
             }
         ))
+    captcha = CaptchaField()
 
     class Meta:
         model = PrismUser

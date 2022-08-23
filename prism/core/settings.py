@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.crypto',
 
-    'django_cleanup.apps.CleanupConfig'
+    'django_cleanup.apps.CleanupConfig',
+    'captcha'
 ]
 
 MIDDLEWARE = [

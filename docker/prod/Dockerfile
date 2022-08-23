@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED 1
 # install dependencies
 COPY requirements.txt .
 RUN apt-get -y update \
-    && apt-get --no-install-recommends -y install make gcc g++ subversion musl-dev libpq-dev\
+    && apt-get --no-install-recommends -y install make gcc g++ subversion musl-dev libpq-dev libz-dev libjpeg-dev libfreetype6-dev python-dev\
     && pip install --upgrade wheel \
     && pip wheel --wheel-dir=/root/wheels -r requirements.txt
 
@@ -39,7 +39,7 @@ RUN mkdir $APP_HOME/mediafiles
 WORKDIR $APP_HOME
 
 # install dependencies
-RUN apt-get -y update && apt-get --no-install-recommends -y install libpq-dev
+RUN apt-get -y update && apt-get --no-install-recommends -y install libpq-dev libz-dev libjpeg-dev libfreetype6-dev python-dev
 COPY --from=builder /root/wheels /root/wheels
 COPY ./requirements.txt .
 RUN pip install --no-index --find-links=/root/wheels -r ./requirements.txt

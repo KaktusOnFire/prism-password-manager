@@ -26,6 +26,7 @@ urlpatterns = [
     path('auth/', include(('apps.authentication.urls'), namespace='accounts')),
     path('users/', include('apps.users.urls')),
     path('secrets/', include('apps.crypto.urls')),
+    path('captcha/', include('captcha.urls')),
     path('', SecretsView.as_view(), name='home'),
 ]
 
