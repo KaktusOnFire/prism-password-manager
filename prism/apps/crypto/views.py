@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import Http404
 
 from cryptography.fernet import InvalidToken
 from backports.zoneinfo import ZoneInfo
@@ -148,7 +149,7 @@ class TemplateEditView(LoginRequiredMixin, KeyCookieRequiredMixin, View):
     object_type: str = None        
 
     def get(self, request, pk, *args, **kwargs):
-        obj = get_object_or_404(self.model, pk=pk)
+        obj = get_object_or_404(self.model, pk=pk, owner=request.user)
         is_err = False
 
         form = self.form(instance=obj)
@@ -161,7 +162,7 @@ class TemplateEditView(LoginRequiredMixin, KeyCookieRequiredMixin, View):
 
 
     def post(self, request, pk, *args, **kwargs):
-        current_data = get_object_or_404(self.model, id=pk)
+        current_data = get_object_or_404(self.model, id=pk, owner=request.user)
         encryption_key = get_encryption_key(request)
         if 'edit' in request.POST:
             form = self.form(data=request.POST, instance=current_data)
@@ -207,6 +208,12 @@ class TemplateEditView(LoginRequiredMixin, KeyCookieRequiredMixin, View):
 class TemplateDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "crypto/delete.html"
     success_url ="/"
+
+    def get_object(self, queryset=None):
+        obj = super(self.model, self).get_object()
+        if obj.owner != self.request.user:
+            raise Http404
+        return obj
 
 #Create Views
 class CreatePasswordView(TemplateCreateView):
