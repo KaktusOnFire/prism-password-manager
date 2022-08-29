@@ -205,15 +205,23 @@ class TemplateEditView(LoginRequiredMixin, KeyCookieRequiredMixin, View):
             }
             return render(request, self.template_name, context)
 
-class TemplateDeleteView(LoginRequiredMixin, DeleteView):
+class TemplateDeleteView(LoginRequiredMixin, View):
     template_name = "crypto/delete.html"
+    model = None
     success_url ="/"
 
-    def get_object(self, queryset=None):
-        obj = super(self.model, self).get_object()
-        if obj.owner != self.request.user:
-            raise Http404
-        return obj
+    def get(self, request, pk, *args, **kwargs):
+        obj = get_object_or_404(self.model, pk=pk, owner=request.user)
+        context = {
+            "object": obj
+        }
+        return render(request, self.template_name, context)
+
+
+    def post(self, request, pk, *args, **kwargs):
+        obj = get_object_or_404(self.model, pk=pk, owner=request.user)
+        obj.delete()
+        return redirect(self.success_url)
 
 #Create Views
 class CreatePasswordView(TemplateCreateView):
