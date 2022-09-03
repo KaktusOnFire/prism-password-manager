@@ -24,7 +24,7 @@ services:
     build: 
       context: .
       dockerfile: docker/prod/Dockerfile
-    command: gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker
+    command: gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
     volumes:
       - ./cdn/staticfiles:/home/prism/web/staticfiles
       - ./cdn/mediafiles:/home/prism/web/mediafiles
