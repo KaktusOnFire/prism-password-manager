@@ -24,7 +24,7 @@ services:
     build: 
       context: .
       dockerfile: docker/prod/Dockerfile
-    command: uvicorn core.asgi:application --host 0.0.0.0 --port 8000
+    command: gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker
     volumes:
       - ./cdn/staticfiles:/home/prism/web/staticfiles
       - ./cdn/mediafiles:/home/prism/web/mediafiles
