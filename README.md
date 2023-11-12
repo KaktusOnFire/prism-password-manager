@@ -33,10 +33,6 @@ Every secret is encrypted using [Fernet](https://cryptography.io/en/latest/ferne
 - Cross-platform
 - Fast deployment
 
-## Website
-
-PRISM is now available at **https://prism.kaktusdev.ru/**
-
 ## Usage
 
 * Register at `/auth/register`
